@@ -6,6 +6,11 @@ already existing site. This project is a working demo to show how fractal
 components could be integrated into the site without changing anything in the
 components.
 
+This demo was done for [issue 1088](https://github.com/frctl/fractal/issues/1088)
+of fractal. Feel free to implement the `render` tag based on this demo and please
+share your implementation with the fractal project.
+
+
 Installation and usage
 --------------------------------------------------------------------------------
 
