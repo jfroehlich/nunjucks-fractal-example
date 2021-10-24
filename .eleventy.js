@@ -19,42 +19,57 @@ module.exports = function(config) {
 
 	// === START OF THE DEMO =================================================
 
-	/**
-	 * 
-	 * 
-	 */
-	config.addNunjucksTag("render", function(nunjucksEngine) {
-		return new function() {
+	class RenderExtension {
+		constructor(engine) {
+			this.engine = engine;
 			this.tags = ["render"];
 			this._components = JSON.parse(
 				fs.readFileSync(path.resolve(process.cwd(), "components.json"))
 			);
+		}
 
-			this.parse = function (parser, nodes, lexer) {
-				let tok = parser.nextToken();
-				let args = parser.parseSignature(null, true);
+		parse(parser, nodes, lexer) {
+			let tok = parser.nextToken();
+			let args = parser.parseSignature(null, true);
 
-				parser.advanceAfterBlockEnd(tok.value);
+			parser.advanceAfterBlockEnd(tok.value);
+			return new nodes.CallExtensionAsync(this, "run", args);
+		};
 
-				return new nodes.CallExtensionAsync(this, "run", args);
-      		};
+		/**
+		 * Renders a component like from a fractal component library.
+		 * 
+		 * This requires a map of components in form of `components.json` file to be placed
+		 * in the root directory of the project.
+		 * 
+		 * When everything is fine you can use `{% render '@myHandle', {name: "schnick"}, true %}`
+		 * in your templates – like you are used to from fractal.
+		 * 
+		 * @param {object} context - The current context from nunjucks
+		 * @param {string} handle - The handle of the component you want to use e.g `@my-component--best-variant`
+		 * @param {object} data - The data you want to put into this component
+		 * @param {boolean} partial - Whether that data is the full set or just some parts (default: false)
+		 * @param {function} callback - The callback from nunjucks which is called when the function is done
+		 */
+		run(context, handle, data={}, partial=false, callback) {
+			if (!(handle in this._components)) {
+				return callback(`Component '${handle}' not found!`);
+			}
 
-      		this.run = function (context, handle, data={}, partial=false, callback) {
-				if (!(handle in this._components)) {
-					return callback(`Component '${handle}' not found!`);
-				}
+			let component = this._components[handle];
+			let ctx = data;
 
-				let component = this._components[handle];
-				let ctx = data;
+			if (partial) {
+				ctx = Object.assign({}, component.ctx, data);
+			}
 
-				if (partial) {
-					ctx = Object.assign({}, component.ctx, data);
-				}
+			let result = context.env.render(component.path, ctx)
+			callback(null, new this.engine.runtime.SafeString(result));
+		};
+	};
 
-				let result = context.env.render(component.path, ctx)
-				callback(null, new nunjucksEngine.runtime.SafeString(result));
-      		};
-    	}();
+	config.addNunjucksTag("render", function(nunjucksEngine) {
+		return new RenderExtension(nunjucksEngine);
   	});
 
 	// === END OF THE DEMO ===================================================
