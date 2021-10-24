@@ -6,7 +6,9 @@
     <title>{{ title }}</title>
 </head>
 <body>
-	{% block content %}{{ content|safe }}{% endblock %}
+	{% block content %}
+	{{ content|safe }}
+	{% endblock %}
 </body>
 </html>
 

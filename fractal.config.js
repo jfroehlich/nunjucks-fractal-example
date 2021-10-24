@@ -29,27 +29,43 @@ fractal.components.engine(nunjucks);
 fractal.components.set("ext", ".html");
 fractal.components.set("exclude", ["**/*~"]);
 
+function makeComponentsMap(app) {
+	const componentsMap = {};
+
+	// build a map of all components
+	for (let item of app.components.flatten()) {
+		// put the "simple" component into the map
+		componentsMap["@" + item.handle] = {path: item.relViewPath, ctx: item.context};
+
+		// iterate the variants array and put all the variants in the map, too
+		for (let variant of item.variants()) {
+			componentsMap["@" + variant.handle] = {path: variant.relViewPath, ctx: variant.context};
+		}
+	}
+
+	try {
+		// write the map to the current working directory which should be the root of the project
+		fs.writeFileSync(`${process.cwd()}/components.json`, JSON.stringify(componentsMap))
+	} catch (error) {
+		console.error(error);
+	}
+}
 
 /**
  * A custom command to write a json file with all components and context
  * to the current working directory.
  */
 fractal.cli.command("components-file", function (args, done) {
-	const app = this.fractal;
-	const sourcemap = {};
-
-	for (let item of app.components.flatten()) {
-		sourcemap["@" + item.handle] = {path: item.relViewPath, ctx: item.context};
-		for (let variant of item.variants()) {
-			sourcemap["@" + variant.handle] = {path: variant.relViewPath, ctx: variant.context};
-		}
-	}
-
-	try {
-		fs.writeFileSync(`${process.cwd()}/components.json`, JSON.stringify(sourcemap))
-	} catch (err) {
-		this.log.error(err);
-	}
-
+	makeComponentsMap(this.fractal);
 	done();
 }, {description: "Create a json file with all json components in the working directory."});
+
+// run the command after the initial load
+fractal.on("source:loaded", function () {
+	makeComponentsMap(fractal);
+});
+
+// run the command after the components were updated after a change
+fractal.on("source:updated", function () {
+	makeComponentsMap(fractal);
+});
