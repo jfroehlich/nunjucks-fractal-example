@@ -33,7 +33,7 @@ module.exports = function(config) {
 			let args = parser.parseSignature(null, true);
 
 			parser.advanceAfterBlockEnd(tok.value);
-			return new nodes.CallExtensionAsync(this, "run", args);
+			return new nodes.CallExtension(this, "run", args);
 		};
 
 		/**
@@ -49,11 +49,10 @@ module.exports = function(config) {
 		 * @param {string} handle - The handle of the component you want to use e.g `@my-component--best-variant`
 		 * @param {object} data - The data you want to put into this component
 		 * @param {boolean} partial - Whether that data is the full set or just some parts (default: false)
-		 * @param {function} callback - The callback from nunjucks which is called when the function is done
 		 */
-		run(context, handle, data={}, partial=false, callback) {
+		run(context, handle, data={}, partial=false) {
 			if (!(handle in this._components)) {
-				return callback(`Component '${handle}' not found!`);
+				throw new Error(`Component '${handle}' not found!`);
 			}
 
 			let component = this._components[handle];
@@ -63,8 +62,12 @@ module.exports = function(config) {
 				ctx = Object.assign({}, component.ctx, data);
 			}
 
-			let result = context.env.render(component.path, ctx)
-			callback(null, new this.engine.runtime.SafeString(result));
+			let result = context.env.render(component.path, ctx, function (error) {
+				if (error) {
+					throw new Error(`Failed to render component '${handle}'.`, error);
+				}
+			});
+			return new this.engine.runtime.SafeString(result);
 		};
 	};
 
