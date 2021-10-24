@@ -1,0 +1,10 @@
+status: ready
+context:
+  headline: "A headline"
+  items:
+    - handle: 'sample'
+      ctx:
+        text: "First sample"
+    - handle: 'sample--modified'
+      ctx:
+        text: "Second sample"

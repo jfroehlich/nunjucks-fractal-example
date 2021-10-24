@@ -1,0 +1,27 @@
+{
+  "name": "nunjucks-fractal-example",
+  "version": "1.0.0",
+  "description": "An example to integrate fractal components in nunjucks e.g. by using eleventy.",
+  "scripts": {
+    "watch:fractal": "npx fractal start --sync",
+    "build:fractal": "npx fractal build",
+    "watch:eleventy": "npx eleventy --serve",
+    "build:eleventy": "npx eleventy",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jfroehlich/nunjucks-fractal-example.git"
+  },
+  "author": "Johannes Fröhlich (https://jfroehlich.net/)",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/jfroehlich/nunjucks-fractal-example/issues"
+  },
+  "homepage": "https://github.com/jfroehlich/nunjucks-fractal-example#readme",
+  "devDependencies": {
+    "@11ty/eleventy": "^0.12.1",
+    "@frctl/fractal": "^1.5.11",
+    "@frctl/nunjucks": "^2.0.13"
+  }
+}

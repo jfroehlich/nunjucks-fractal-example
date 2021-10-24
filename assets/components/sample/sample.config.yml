@@ -1,0 +1,9 @@
+status: ready
+context:
+  text: "Simple sample"
+
+variants:
+  - name: "modified" 
+    context:
+      classes: "sample--modified"
+      text: "Modified Sample"

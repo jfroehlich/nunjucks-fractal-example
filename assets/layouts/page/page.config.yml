@@ -1,0 +1,4 @@
+root: true
+context:
+  title: "Sample page"
+  content: "Not a complicated fractal example."

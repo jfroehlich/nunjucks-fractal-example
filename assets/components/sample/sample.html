@@ -1,0 +1,7 @@
+{% if classes %}
+<!-- 
+    This is dead ugly but should do the trick for demonstration.
+    Use a real stylesheet file, please.  -->
+<style type="text/css">.sample--modified {color: red;}</style>
+{% endif %}
+<p class="sample{% if classes %} {{ classes }}{% endif %}">{{ text }}</p>

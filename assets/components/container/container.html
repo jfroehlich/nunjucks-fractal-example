@@ -1,0 +1,6 @@
+<section class="container">
+    <h2>{{ headline }}</h2>
+    {% for item in items %}
+    {% render '@' + item.handle, item.ctx, true %}
+    {% endfor %}
+</section>
